@@ -1,0 +1,4 @@
+django==6.1.2
+djangorestframework==3.18.3
+gunicorn==26.2.0
+mysqlclient>=2.2.1

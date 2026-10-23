@@ -10,22 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rjdc&1#i$saj@coae3ngm$5&)xxo)s*yon-wcv1dvpq6)5-omi'
+# SECURITY WARNING: set a real DJANGO_SECRET_KEY in production.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -37,6 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -71,13 +70,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# MySQL when DB_HOST is set (Docker Compose), otherwise a local SQLite file.
+if os.environ.get("DB_HOST"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ.get("DB_NAME", "kabale_db"),
+            "USER": os.environ.get("DB_USER", "root"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+            "HOST": os.environ["DB_HOST"],
+            "PORT": os.environ.get("DB_PORT", "3306"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
