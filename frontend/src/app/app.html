@@ -1,0 +1,46 @@
+<main class="page">
+  <header>
+    <h1>Kabale University</h1>
+    <p>Student records</p>
+  </header>
+
+  @if (error()) {
+    <div class="error" role="alert">{{ error() }}</div>
+  }
+
+  <section class="card">
+    <h2>Add a student</h2>
+    <form (ngSubmit)="add()" #f="ngForm" class="form">
+      <input name="reg" [(ngModel)]="form.registration_number" placeholder="Registration no." required />
+      <input name="name" [(ngModel)]="form.full_name" placeholder="Full name" required />
+      <input name="email" [(ngModel)]="form.email" type="email" placeholder="Email" />
+      <input name="course" [(ngModel)]="form.course" placeholder="Course" required />
+      <input name="year" [(ngModel)]="form.year_of_study" type="number" min="1" max="7" placeholder="Year" required />
+      <button type="submit" [disabled]="f.invalid">Add</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Students ({{ students().length }})</h2>
+    @if (students().length === 0) {
+      <p class="empty">No students yet. Add the first one above.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr><th>Reg. no.</th><th>Name</th><th>Course</th><th>Year</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (s of students(); track s.id) {
+            <tr>
+              <td>{{ s.registration_number }}</td>
+              <td>{{ s.full_name }}<small>{{ s.email }}</small></td>
+              <td>{{ s.course }}</td>
+              <td>{{ s.year_of_study }}</td>
+              <td><button class="danger" (click)="remove(s)">Delete</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</main>
